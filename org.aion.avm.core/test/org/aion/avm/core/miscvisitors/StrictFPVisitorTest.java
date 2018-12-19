@@ -8,6 +8,7 @@ import org.aion.avm.core.dappreading.JarBuilder;
 import org.aion.avm.core.dappreading.LoadedJar;
 import org.aion.avm.core.util.CodeAndArguments;
 import org.aion.avm.core.util.Helpers;
+import org.aion.kernel.AvmAddress;
 import org.aion.kernel.Block;
 import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.Transaction;
@@ -32,8 +33,8 @@ public class StrictFPVisitorTest {
     // block
     private Block block = new Block(new byte[32], 1, Helpers.randomBytes(Address.LENGTH), System.currentTimeMillis(), new byte[0]);
 
-    private byte[] deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
-    private byte[] dappAddress;
+    private org.aion.vm.api.interfaces.Address deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
+    private org.aion.vm.api.interfaces.Address dappAddress;
 
     private KernelInterfaceImpl kernel;
     private Avm avm;
@@ -45,11 +46,11 @@ public class StrictFPVisitorTest {
         
         byte[] jar = JarBuilder.buildJarForMainAndClasses(StrictFPVisitorTestResource.class);
         byte[] arguments = null;
-        Transaction tx = Transaction.create(deployer, kernel.getNonce(deployer), BigInteger.ZERO, new CodeAndArguments(jar, arguments).encodeToBytes(), energyLimit, energyPrice);
+        Transaction tx = Transaction.create(deployer, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, new CodeAndArguments(jar, arguments).encodeToBytes(), energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
         TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
 
-        dappAddress = txResult.getReturnData();
+        dappAddress = AvmAddress.wrap(txResult.getReturnData());
         assertTrue(null != dappAddress);
     }
 
@@ -71,7 +72,7 @@ public class StrictFPVisitorTest {
 
     @Test
     public void testFp() {
-        Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer), BigInteger.ZERO, new byte[0], energyLimit, energyPrice);
+        Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, new byte[0], energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
         TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
         assertTrue(txResult.getStatusCode().isSuccess());

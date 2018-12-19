@@ -15,7 +15,9 @@ import org.aion.avm.internal.CommonInstrumentation;
 import org.aion.avm.internal.IInstrumentation;
 import org.aion.avm.internal.IRuntimeSetup;
 import org.aion.avm.internal.InstrumentationHelpers;
+import org.aion.kernel.AvmAddress;
 import org.aion.kernel.KernelInterfaceImpl;
+import org.aion.vm.api.interfaces.Address;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,7 +78,7 @@ public class LoadedDAppTest {
         LoadedDAppTarget.s_eight = 5.0d;
 
         KernelInterfaceImpl kernel = new KernelInterfaceImpl();
-        byte[] address = new byte[] {1,2,3};
+        Address address = getNewAddress();
         KeyValueObjectGraph objectGraph = new KeyValueObjectGraph(kernel, address);
         LoadedDApp dapp = new LoadedDApp(this.loader, Arrays.asList(ReflectionStructureCodecTarget.class, LoadedDAppTarget.class), ReflectionStructureCodecTarget.class.getName());
         ReflectionStructureCodec directGraphData = dapp.createCodecForInitialStore(FEE_PROCESSOR, objectGraph);
@@ -149,7 +151,7 @@ public class LoadedDAppTest {
                 0x40, 0x14, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, //s_eight
         };
         KernelInterfaceImpl kernel = new KernelInterfaceImpl();
-        byte[] address = new byte[] {1,2,3};
+        Address address = getNewAddress();
         kernel.putStorage(address, StorageKeys.CLASS_STATICS, expected);
         
         // Populate the classes.
@@ -191,7 +193,7 @@ public class LoadedDAppTest {
         ReflectionStructureCodecTarget.s_nine = new ReflectionStructureCodecTarget();
         
         KernelInterfaceImpl kernel = new KernelInterfaceImpl();
-        byte[] address = new byte[] {1,2,3};
+        Address address = getNewAddress();
         KeyValueObjectGraph objectGraph = new KeyValueObjectGraph(kernel, address);
         LoadedDApp dapp = new LoadedDApp(this.loader, Arrays.asList(ReflectionStructureCodecTarget.class), ReflectionStructureCodecTarget.class.getName());
         ReflectionStructureCodec directGraphData = dapp.createCodecForInitialStore(FEE_PROCESSOR, objectGraph);
@@ -267,7 +269,7 @@ public class LoadedDAppTest {
         ((ReflectionStructureCodecTarget)ReflectionStructureCodecTargetSub.s_nine).i_nine = ReflectionStructureCodecTarget.s_nine;
         
         KernelInterfaceImpl kernel = new KernelInterfaceImpl();
-        byte[] address = new byte[] {1,2,3};
+        Address address = getNewAddress();
         KeyValueObjectGraph objectGraph = new KeyValueObjectGraph(kernel, address);
         LoadedDApp dapp = new LoadedDApp(this.loader, Arrays.asList(ReflectionStructureCodecTarget.class, ReflectionStructureCodecTargetSub.class), ReflectionStructureCodecTarget.class.getName());
         ReflectionStructureCodec directGraphData = dapp.createCodecForInitialStore(FEE_PROCESSOR, objectGraph);
@@ -339,7 +341,7 @@ public class LoadedDAppTest {
         LoadedDAppTarget.s_nine = org.aion.avm.shadow.java.math.RoundingMode.avm_HALF_EVEN;
         
         KernelInterfaceImpl kernel = new KernelInterfaceImpl();
-        byte[] address = new byte[] {1,2,3};
+        Address address = getNewAddress();
         KeyValueObjectGraph objectGraph = new KeyValueObjectGraph(kernel, address);
         LoadedDApp dapp = new LoadedDApp(this.loader, Arrays.asList(LoadedDAppTarget.class), LoadedDAppTarget.class.getName());
         ReflectionStructureCodec directGraphData = dapp.createCodecForInitialStore(FEE_PROCESSOR, objectGraph);
@@ -379,7 +381,7 @@ public class LoadedDAppTest {
         LoadedDAppTarget.s_nine = originalClassRef;
         
         KernelInterfaceImpl kernel = new KernelInterfaceImpl();
-        byte[] address = new byte[] {1,2,3};
+        Address address = getNewAddress();
         KeyValueObjectGraph objectGraph = new KeyValueObjectGraph(kernel, address);
         LoadedDApp dapp = new LoadedDApp(this.loader, Arrays.asList(LoadedDAppTarget.class), LoadedDAppTarget.class.getName());
         ReflectionStructureCodec directGraphData = dapp.createCodecForInitialStore(FEE_PROCESSOR, objectGraph);
@@ -419,7 +421,7 @@ public class LoadedDAppTest {
         LoadedDAppTarget.s_nine = org.aion.avm.shadow.java.lang.Byte.avm_TYPE;
         
         KernelInterfaceImpl kernel = new KernelInterfaceImpl();
-        byte[] address = new byte[] {1,2,3};
+        Address address = getNewAddress();
         KeyValueObjectGraph objectGraph = new KeyValueObjectGraph(kernel, address);
         LoadedDApp dapp = new LoadedDApp(this.loader, Arrays.asList(LoadedDAppTarget.class), LoadedDAppTarget.class.getName());
         ReflectionStructureCodec directGraphData = dapp.createCodecForInitialStore(FEE_PROCESSOR, objectGraph);
@@ -456,7 +458,7 @@ public class LoadedDAppTest {
     @Test
     public void memoryAndDiskSerializersSameCost() {
         // Create the DApp.
-        byte[] address = new byte[] {1,2,3};
+        Address address = getNewAddress();
         KernelInterfaceImpl kernel = new KernelInterfaceImpl();
         KeyValueObjectGraph objectGraph = new KeyValueObjectGraph(kernel, address);
         LoadedDApp dapp = new LoadedDApp(this.loader, Arrays.asList(ReflectionStructureCodecTarget.class), ReflectionStructureCodecTarget.class.getName());
@@ -588,5 +590,9 @@ public class LoadedDAppTest {
         public void writeUpdateOneInstanceToHeap(int byteSize) {
             this.count_writeOneInstanceToHeap += 1;
         }
+    }
+
+    private static Address getNewAddress() {
+        return AvmAddress.wrap(Helpers.randomBytes(Address.SIZE));
     }
 }

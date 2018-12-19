@@ -9,6 +9,7 @@ import org.aion.avm.core.util.TestingHelper;
 import org.aion.avm.core.dappreading.JarBuilder;
 import org.aion.avm.core.util.CodeAndArguments;
 import org.aion.avm.core.util.Helpers;
+import org.aion.kernel.AvmAddress;
 import org.aion.kernel.Block;
 import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.Transaction;
@@ -29,7 +30,7 @@ import org.junit.Test;
  * It may be worth relying on some more coarse-grained information, should it become available.
  */
 public class GraphReachabilityIntegrationTest {
-    private byte[] deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
+    private org.aion.vm.api.interfaces.Address deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
 
     private KernelInterfaceImpl kernel;
     private Avm avm;
@@ -325,7 +326,7 @@ public class GraphReachabilityIntegrationTest {
         // Deploy.
         long energyLimit = 1_000_000l;
         long energyPrice = 1l;
-        Transaction create = Transaction.create(deployer, kernel.getNonce(deployer), BigInteger.ZERO, txData, energyLimit, energyPrice);
+        Transaction create = Transaction.create(deployer, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionResult createResult = avm.run(new TransactionContext[] {new TransactionContextImpl(create, block)})[0].get();
         Assert.assertEquals(TransactionResult.Code.SUCCESS, createResult.getStatusCode());
         Address contractAddr = TestingHelper.buildAddress(createResult.getReturnData());
@@ -356,7 +357,7 @@ public class GraphReachabilityIntegrationTest {
     private Object callStatic(Block block, Address contractAddr, long expectedCost, String methodName, Object... args) {
         long energyLimit = 1_000_000l;
         byte[] argData = ABIEncoder.encodeMethodArguments(methodName, args);
-        Transaction call = Transaction.call(deployer, contractAddr.unwrap(), kernel.getNonce(deployer), BigInteger.ZERO, argData, energyLimit, 1l);
+        Transaction call = Transaction.call(deployer, AvmAddress.wrap(contractAddr.unwrap()), kernel.getNonce(deployer).longValue(), BigInteger.ZERO, argData, energyLimit, 1l);
         TransactionResult result = avm.run(new TransactionContext[] {new TransactionContextImpl(call, block)})[0].get();
         Assert.assertEquals(TransactionResult.Code.SUCCESS, result.getStatusCode());
         Assert.assertEquals(expectedCost, result.getEnergyUsed());
@@ -408,7 +409,7 @@ public class GraphReachabilityIntegrationTest {
     private TransactionResult runGc(Block block, Address contractAddr) {
         long energyLimit = 1_000_000l;
         long energyPrice = 1l;
-        Transaction gc = Transaction.garbageCollect(contractAddr.unwrap(), kernel.getNonce(contractAddr.unwrap()), energyLimit, energyPrice);
+        Transaction gc = Transaction.garbageCollect(AvmAddress.wrap(contractAddr.unwrap()), kernel.getNonce(AvmAddress.wrap(contractAddr.unwrap())).longValue(), energyLimit, energyPrice);
         TransactionResult gcResult = avm.run(new TransactionContext[] {new TransactionContextImpl(gc, block)})[0].get();
         return gcResult;
     }

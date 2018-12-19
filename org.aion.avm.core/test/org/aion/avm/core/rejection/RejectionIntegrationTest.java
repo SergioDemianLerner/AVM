@@ -25,7 +25,7 @@ import org.junit.Test;
  */
 public class RejectionIntegrationTest {
     // We will reuse these, for now, since we want to test that doing so is safe.  We may change this, in the future, is we depend on something perturbed by this.
-    private static final byte[] deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
+    private static final org.aion.vm.api.interfaces.Address deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
     private static KernelInterfaceImpl kernel;
     private static Avm avm;
 
@@ -49,7 +49,7 @@ public class RejectionIntegrationTest {
         // Deploy.
         long energyLimit = 1_000_000l;
         long energyPrice = 1l;
-        Transaction create = Transaction.create(deployer, kernel.getNonce(deployer), BigInteger.ZERO, txData, energyLimit, energyPrice);
+        Transaction create = Transaction.create(deployer, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionResult createResult = avm.run(new TransactionContext[] {new TransactionContextImpl(create, block)})[0].get();
         Assert.assertEquals(TransactionResult.Code.FAILED_REJECTED, createResult.getStatusCode());
     }

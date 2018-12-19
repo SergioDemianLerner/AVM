@@ -8,14 +8,15 @@ import org.aion.avm.core.util.Helpers;
 import org.aion.avm.userlib.AionList;
 import org.aion.avm.userlib.AionMap;
 import org.aion.avm.userlib.AionSet;
+import org.aion.kernel.AvmAddress;
 import org.aion.kernel.Block;
-import org.aion.kernel.KernelInterface;
 import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.Transaction;
 import org.aion.kernel.TransactionContext;
 import org.aion.kernel.TransactionContextImpl;
 import org.aion.kernel.TransactionResult;
 
+import org.aion.vm.api.interfaces.KernelInterface;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -61,10 +62,10 @@ public class BasicPerfTest {
 
 
     private static class TestRunnable extends Thread {
-        private byte[] deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
+        private org.aion.vm.api.interfaces.Address deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
         private KernelInterface kernel;
         private Avm avm;
-        private byte[] contractAddress;
+        private org.aion.vm.api.interfaces.Address contractAddress;
         private Throwable backgroundThrowable;
         public void deploy(byte[] jar, byte[] arguments) {
             // Deploy.
@@ -72,10 +73,10 @@ public class BasicPerfTest {
             this.avm = CommonAvmFactory.buildAvmInstance(kernel);
             Block block = new Block(new byte[32], 1, Helpers.randomBytes(Address.LENGTH), System.currentTimeMillis(), new byte[0]);
             long transaction1EnergyLimit = 1_000_000_000l;
-            Transaction tx1 = Transaction.create(deployer, kernel.getNonce(deployer), BigInteger.ZERO, new CodeAndArguments(jar, arguments).encodeToBytes(), transaction1EnergyLimit, 1L);
+            Transaction tx1 = Transaction.create(deployer, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, new CodeAndArguments(jar, arguments).encodeToBytes(), transaction1EnergyLimit, 1L);
             TransactionResult result1 = this.avm.run(new TransactionContext[] {new TransactionContextImpl(tx1, block)})[0].get();
             Assert.assertEquals(TransactionResult.Code.SUCCESS, result1.getStatusCode());
-            this.contractAddress = result1.getReturnData();
+            this.contractAddress = AvmAddress.wrap(result1.getReturnData());
         }
         public void waitForSafeTermination() throws Throwable {
             this.join();
@@ -97,13 +98,13 @@ public class BasicPerfTest {
             for (int i = blockStart; i < (COUNT + blockStart); ++i) {
                 Block block = new Block(new byte[32], i, Helpers.randomBytes(Address.LENGTH), System.currentTimeMillis(), new byte[0]);
                 long transaction1EnergyLimit = 1_000_000_000l;
-                Transaction tx1 = Transaction.call(deployer, this.contractAddress, kernel.getNonce(deployer), BigInteger.ZERO, new byte[0], transaction1EnergyLimit, 1L);
+                Transaction tx1 = Transaction.call(deployer, this.contractAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, new byte[0], transaction1EnergyLimit, 1L);
                 TransactionResult result1 = this.avm.run(new TransactionContext[] {new TransactionContextImpl(tx1, block)})[0].get();
                 Assert.assertEquals(TransactionResult.Code.SUCCESS, result1.getStatusCode());
                 
                 // Every 100 iterations, we also want to run a GC, to verify that this doesn't break anything in a long-running test.
                 if (0 == (i % 100)) {
-                    Transaction gcCall = Transaction.garbageCollect(this.contractAddress, kernel.getNonce(this.contractAddress), transaction1EnergyLimit, 1L);
+                    Transaction gcCall = Transaction.garbageCollect(this.contractAddress, kernel.getNonce(this.contractAddress).longValue(), transaction1EnergyLimit, 1L);
                     TransactionResult gcResult = this.avm.run(new TransactionContext[] {new TransactionContextImpl(gcCall, block)})[0].get();
                     Assert.assertEquals(TransactionResult.Code.SUCCESS, gcResult.getStatusCode());
                     // Note that this GC never actually frees anything, since our workload never orphans objects.

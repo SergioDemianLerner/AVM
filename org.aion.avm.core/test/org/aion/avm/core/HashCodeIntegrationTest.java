@@ -6,6 +6,7 @@ import org.aion.avm.core.persistence.keyvalue.KeyValueObjectGraph;
 import org.aion.avm.core.util.CodeAndArguments;
 import org.aion.avm.core.util.Helpers;
 import org.aion.avm.core.util.TestingHelper;
+import org.aion.kernel.AvmAddress;
 import org.aion.kernel.Block;
 import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.Transaction;
@@ -24,7 +25,7 @@ import org.junit.Test;
  * Tests the hashCode behaviour of the contract code, when invoked within independent transactions.
  */
 public class HashCodeIntegrationTest {
-    private byte[] deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
+    private org.aion.vm.api.interfaces.Address deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
     private KernelInterfaceImpl kernel;
     private Avm avm;
 
@@ -48,7 +49,7 @@ public class HashCodeIntegrationTest {
         // Deploy.
         long energyLimit = 1_000_000l;
         long energyPrice = 1l;
-        Transaction create = Transaction.create(deployer, kernel.getNonce(deployer), BigInteger.ZERO, txData, energyLimit, energyPrice);
+        Transaction create = Transaction.create(deployer, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionResult createResult = avm.run(new TransactionContext[] {new TransactionContextImpl(create, block)})[0].get();
         Assert.assertEquals(TransactionResult.Code.SUCCESS, createResult.getStatusCode());
         if (KeyValueObjectGraph.USE_DELTA_HASH) {
@@ -72,7 +73,7 @@ public class HashCodeIntegrationTest {
     private Object callStatic(Block block, Address contractAddr, String methodName) {
         long energyLimit = 1_000_000l;
         byte[] argData = ABIEncoder.encodeMethodArguments(methodName);
-        Transaction call = Transaction.call(deployer, contractAddr.unwrap(), kernel.getNonce(deployer), BigInteger.ZERO, argData, energyLimit, 1l);
+        Transaction call = Transaction.call(deployer, AvmAddress.wrap(contractAddr.unwrap()), kernel.getNonce(deployer).longValue(), BigInteger.ZERO, argData, energyLimit, 1l);
         TransactionResult result = avm.run(new TransactionContext[] {new TransactionContextImpl(call, block)})[0].get();
         Assert.assertEquals(TransactionResult.Code.SUCCESS, result.getStatusCode());
         // Both of the calls this test makes to this helper leave the data in the same state so we can check the hash, here.

@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class RejectVirtualMachineErrorIntegrationTest {
     // We will reuse these, for now, since we want to test that doing so is safe.  We may change this, in the future, is we depend on something perturbed by this.
-    private static final byte[] deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
+    private static final org.aion.vm.api.interfaces.Address deployer = KernelInterfaceImpl.PREMINED_ADDRESS;
     private static KernelInterfaceImpl kernel;
     private static Avm avm;
 
@@ -77,7 +77,7 @@ public class RejectVirtualMachineErrorIntegrationTest {
         long energyLimit = 1_000_000l;
         long energyPrice = 1l;
         byte[] txData = new CodeAndArguments(jar, new byte[0]).encodeToBytes();
-        Transaction create = Transaction.create(deployer, kernel.getNonce(deployer), BigInteger.ZERO, txData, energyLimit, energyPrice);
+        Transaction create = Transaction.create(deployer, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         Block block = new Block(new byte[32], 1, Helpers.randomBytes(Address.LENGTH), System.currentTimeMillis(), new byte[0]);
         TransactionResult createResult = avm.run(new TransactionContext[] {new TransactionContextImpl(create, block)})[0].get();
         return createResult;

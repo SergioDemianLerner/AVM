@@ -10,12 +10,12 @@ import org.aion.avm.core.dappreading.JarBuilder;
 import org.aion.avm.core.util.CodeAndArguments;
 import org.aion.avm.core.util.Helpers;
 import org.aion.kernel.Block;
-import org.aion.kernel.KernelInterface;
 import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.Transaction;
 import org.aion.kernel.TransactionContext;
 import org.aion.kernel.TransactionContextImpl;
 import org.aion.kernel.TransactionResult;
+import org.aion.vm.api.interfaces.KernelInterface;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class TestBootstrapsCannotBeCalled {
     private Avm avm;
     private KernelInterface kernel;
     private Block block;
-    private byte[] deployer;
+    private org.aion.vm.api.interfaces.Address deployer;
 
     @Before
     public void setup() {
@@ -45,19 +45,19 @@ public class TestBootstrapsCannotBeCalled {
 
     @Test
     public void testStringConcatFactoryMakeConcat() {
-        TransactionResult result = deployContract(MakeConcatTarget.class, kernel.getNonce(deployer));
+        TransactionResult result = deployContract(MakeConcatTarget.class, kernel.getNonce(deployer).longValue());
         assertTrue(result.getStatusCode().isFailed());
     }
 
     @Test
     public void testStringConcatFactoryMakeConcatWithConstants() {
-        TransactionResult result = deployContract(MakeConcatWithConstantsTarget.class, kernel.getNonce(deployer));
+        TransactionResult result = deployContract(MakeConcatWithConstantsTarget.class, kernel.getNonce(deployer).longValue());
         assertTrue(result.getStatusCode().isFailed());
     }
 
     @Test
     public void testLambdaMetaFactory() {
-        TransactionResult result = deployContract(MetaFactoryTarget.class, kernel.getNonce(deployer));
+        TransactionResult result = deployContract(MetaFactoryTarget.class, kernel.getNonce(deployer).longValue());
         assertTrue(result.getStatusCode().isFailed());
     }
 

@@ -11,7 +11,7 @@ import org.aion.avm.internal.RevertException;
 import org.aion.avm.internal.RuntimeAssertionError;
 import org.aion.avm.shadow.java.lang.String;
 import org.aion.avm.shadow.java.math.BigInteger;
-import org.aion.kernel.KernelInterface;
+import org.aion.kernel.AvmAddress;
 import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.TransactionContext;
 
@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import org.aion.vm.api.interfaces.KernelInterface;
 
 
 /**
@@ -161,13 +162,13 @@ public class TestingBlockchainRuntime implements IBlockchainRuntime {
     @Override
     public BigInteger avm_getBalance(Address address) {
         Objects.requireNonNull(address);
-        return new BigInteger(kernel.getBalance(address.unwrap()));
+        return new BigInteger(kernel.getBalance(AvmAddress.wrap(address.unwrap())));
     }
 
     @Override
     public int avm_getCodeSize(Address address) {
         Objects.requireNonNull(address);
-        byte[] vc = kernel.getCode(address.unwrap());
+        byte[] vc = kernel.getCode(AvmAddress.wrap(address.unwrap()));
         return vc == null ? 0 : vc.length;
     }
 

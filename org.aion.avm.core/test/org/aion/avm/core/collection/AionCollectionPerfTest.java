@@ -10,13 +10,14 @@ import org.aion.avm.core.util.CodeAndArguments;
 import org.aion.avm.core.util.Helpers;
 import org.aion.avm.userlib.*;
 import org.aion.kernel.*;
+import org.aion.vm.api.interfaces.KernelInterface;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class AionCollectionPerfTest {
 
-    private byte[] from = KernelInterfaceImpl.PREMINED_ADDRESS;
+    private org.aion.vm.api.interfaces.Address from = KernelInterfaceImpl.PREMINED_ADDRESS;
     private Block block = new Block(new byte[32], 1, Helpers.randomBytes(Address.LENGTH), System.currentTimeMillis(), new byte[0]);
     private long energyLimit = 100_000_000_000L;
     private long energyPrice = 1;
@@ -53,7 +54,7 @@ public class AionCollectionPerfTest {
 
 
         byte[] testWalletArguments = new byte[0];
-        Transaction createTransaction = Transaction.create(from, kernel.getNonce(from), BigInteger.ZERO, new CodeAndArguments(testJar, testWalletArguments).encodeToBytes(), energyLimit, energyPrice);
+        Transaction createTransaction = Transaction.create(from, kernel.getNonce(from).longValue(), BigInteger.ZERO, new CodeAndArguments(testJar, testWalletArguments).encodeToBytes(), energyLimit, energyPrice);
         TransactionContext createContext = new TransactionContextImpl(createTransaction, block);
         TransactionResult createResult = avm.run(new TransactionContext[] {createContext})[0].get();
 
@@ -63,8 +64,8 @@ public class AionCollectionPerfTest {
     }
 
 
-    private TransactionResult call(KernelInterface kernel, Avm avm, byte[] contract, byte[] sender, byte[] args) {
-        Transaction callTransaction = Transaction.call(sender, contract, kernel.getNonce(sender), BigInteger.ZERO, args, energyLimit, 1l);
+    private TransactionResult call(KernelInterface kernel, Avm avm, org.aion.vm.api.interfaces.Address contract, org.aion.vm.api.interfaces.Address sender, byte[] args) {
+        Transaction callTransaction = Transaction.call(sender, contract, kernel.getNonce(sender).longValue(), BigInteger.ZERO, args, energyLimit, 1l);
         TransactionContext callContext = new TransactionContextImpl(callTransaction, block);
         TransactionResult callResult = avm.run(new TransactionContext[] {callContext})[0].get();
         Assert.assertEquals(TransactionResult.Code.SUCCESS, callResult.getStatusCode());
@@ -80,7 +81,7 @@ public class AionCollectionPerfTest {
         Avm avm = CommonAvmFactory.buildAvmInstance(kernel);
 
         TransactionResult deployRes = deploy(kernel, avm, buildListPerfJar());
-        byte[] contract = deployRes.getReturnData();
+        org.aion.vm.api.interfaces.Address contract = AvmAddress.wrap(deployRes.getReturnData());
 
         args = ABIEncoder.encodeMethodArguments("callInit");
         TransactionResult initResult = call(kernel, avm, contract, from, args);
@@ -115,7 +116,7 @@ public class AionCollectionPerfTest {
         Avm avm = CommonAvmFactory.buildAvmInstance(kernel);
 
         TransactionResult deployRes = deploy(kernel, avm, buildSetPerfJar());
-        byte[] contract = deployRes.getReturnData();
+        org.aion.vm.api.interfaces.Address contract = AvmAddress.wrap(deployRes.getReturnData());
 
         args = ABIEncoder.encodeMethodArguments("callInit");
         TransactionResult initResult = call(kernel, avm, contract, from, args);
@@ -166,7 +167,7 @@ public class AionCollectionPerfTest {
         Avm avm = CommonAvmFactory.buildAvmInstance(kernel);
 
         TransactionResult deployRes = deploy(kernel, avm, buildMapPerfJar());
-        byte[] contract = deployRes.getReturnData();
+        org.aion.vm.api.interfaces.Address contract = AvmAddress.wrap(deployRes.getReturnData());
 
         args = ABIEncoder.encodeMethodArguments("callInit");
         TransactionResult initResult = call(kernel, avm, contract, from, args);
