@@ -8,12 +8,12 @@ import org.aion.avm.core.types.InternalTransaction;
 import org.aion.avm.core.util.CodeAndArguments;
 import org.aion.avm.core.util.Helpers;
 import org.aion.kernel.AvmAddress;
+import org.aion.kernel.AvmTransactionResult;
 import org.aion.kernel.Block;
 import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.Transaction;
 import org.aion.kernel.TransactionContext;
 import org.aion.kernel.TransactionContextImpl;
-import org.aion.kernel.TransactionResult;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class AvmFailureTest {
         byte[] arguments = null;
         Transaction tx = Transaction.create(deployer, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, new CodeAndArguments(jar, arguments).encodeToBytes(), energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
-        TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
+        AvmTransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
 
         dappAddress = AvmAddress.wrap(txResult.getReturnData());
         assertTrue(null != dappAddress);
@@ -63,9 +63,9 @@ public class AvmFailureTest {
         byte[] data = ABIEncoder.encodeMethodArguments("reentrantCall", 5);
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, data, energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
-        TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
+        AvmTransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
 
-        assertEquals(TransactionResult.Code.FAILED_REVERT, txResult.getStatusCode());
+        assertEquals(AvmTransactionResult.Code.FAILED_REVERT, txResult.getResultCode());
         assertEquals(5, txResult.getInternalTransactions().size());
         assertEquals(0, txResult.getLogs().size());
 
@@ -79,9 +79,9 @@ public class AvmFailureTest {
         byte[] data = ABIEncoder.encodeMethodArguments("testOutOfEnergy");
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, data, energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
-        TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
+        AvmTransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
 
-        assertEquals(TransactionResult.Code.FAILED_OUT_OF_ENERGY, txResult.getStatusCode());
+        assertEquals(AvmTransactionResult.Code.FAILED_OUT_OF_ENERGY, txResult.getResultCode());
     }
 
     @Test
@@ -89,9 +89,9 @@ public class AvmFailureTest {
         byte[] data = ABIEncoder.encodeMethodArguments("testOutOfStack");
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, data, energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
-        TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
+        AvmTransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
 
-        assertEquals(TransactionResult.Code.FAILED_OUT_OF_STACK, txResult.getStatusCode());
+        assertEquals(AvmTransactionResult.Code.FAILED_OUT_OF_STACK, txResult.getResultCode());
     }
 
     @Test
@@ -99,9 +99,9 @@ public class AvmFailureTest {
         byte[] data = ABIEncoder.encodeMethodArguments("testRevert");
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, data, energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
-        TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
+        AvmTransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
 
-        assertEquals(TransactionResult.Code.FAILED_REVERT, txResult.getStatusCode());
+        assertEquals(AvmTransactionResult.Code.FAILED_REVERT, txResult.getResultCode());
         assertNotEquals(energyLimit, txResult.getEnergyUsed());
     }
 
@@ -110,9 +110,9 @@ public class AvmFailureTest {
         byte[] data = ABIEncoder.encodeMethodArguments("testInvalid");
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, data, energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
-        TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
+        AvmTransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
 
-        assertEquals(TransactionResult.Code.FAILED_INVALID, txResult.getStatusCode());
+        assertEquals(AvmTransactionResult.Code.FAILED_INVALID, txResult.getResultCode());
         assertEquals(energyLimit, txResult.getEnergyUsed());
     }
 
@@ -121,9 +121,9 @@ public class AvmFailureTest {
         byte[] data = ABIEncoder.encodeMethodArguments("testUncaughtException");
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, data, energyLimit, energyPrice);
         TransactionContext txContext = new TransactionContextImpl(tx, block);
-        TransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
+        AvmTransactionResult txResult = avm.run(new TransactionContext[] {txContext})[0].get();
 
-        assertEquals(TransactionResult.Code.FAILED_EXCEPTION, txResult.getStatusCode());
+        assertEquals(AvmTransactionResult.Code.FAILED_EXCEPTION, txResult.getResultCode());
         assertTrue(txResult.getUncaughtException() instanceof RuntimeException);
     }
 }

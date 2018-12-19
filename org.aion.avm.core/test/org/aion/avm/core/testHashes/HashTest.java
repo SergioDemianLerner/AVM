@@ -62,8 +62,8 @@ public class HashTest {
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
 
-        TransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
-        Assert.assertEquals(TransactionResult.Code.SUCCESS, txResult.getStatusCode());
+        AvmTransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
+        Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult.getResultCode());
         Assert.assertEquals(true, (TestingHelper.decodeResult(txResult)));
 
         // Retrieve hash
@@ -71,8 +71,8 @@ public class HashTest {
         Transaction tx2 = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData2, energyLimit, energyPrice);
         TransactionContextImpl context2 = new TransactionContextImpl(tx2, block);
 
-        TransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
-        Assert.assertEquals(TransactionResult.Code.SUCCESS, txResult2.getStatusCode());
+        AvmTransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
+        Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult2.getResultCode());
 
         // check hash correctness
         byte[] hash = (byte[]) TestingHelper.decodeResult(txResult2);
@@ -94,8 +94,8 @@ public class HashTest {
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
 
-        TransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
-        Assert.assertEquals(TransactionResult.Code.SUCCESS, txResult.getStatusCode());
+        AvmTransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
+        Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult.getResultCode());
         Assert.assertEquals(true, (TestingHelper.decodeResult(txResult)));
 
         // Retrieve hash
@@ -103,8 +103,8 @@ public class HashTest {
         Transaction tx2 = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData2, energyLimit, energyPrice);
         TransactionContextImpl context2 = new TransactionContextImpl(tx2, block);
 
-        TransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
-        Assert.assertEquals(TransactionResult.Code.SUCCESS, txResult2.getStatusCode());
+        AvmTransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
+        Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult2.getResultCode());
 
         // check hash correctness
         byte[] hash = (byte[]) TestingHelper.decodeResult(txResult2);
@@ -126,8 +126,8 @@ public class HashTest {
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
 
-        TransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
-        Assert.assertEquals(TransactionResult.Code.SUCCESS, txResult.getStatusCode());
+        AvmTransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
+        Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult.getResultCode());
         Assert.assertEquals(true, (TestingHelper.decodeResult(txResult)));
 
         // Retrieve hash
@@ -135,8 +135,8 @@ public class HashTest {
         Transaction tx2 = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData2, energyLimit, energyPrice);
         TransactionContextImpl context2 = new TransactionContextImpl(tx2, block);
 
-        TransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
-        Assert.assertEquals(TransactionResult.Code.SUCCESS, txResult2.getStatusCode());
+        AvmTransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
+        Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult2.getResultCode());
 
         // check hash correctness
         byte[] hash = (byte[]) TestingHelper.decodeResult(txResult2);

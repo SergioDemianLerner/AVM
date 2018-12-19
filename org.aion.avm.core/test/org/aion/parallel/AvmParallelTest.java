@@ -43,8 +43,8 @@ public class AvmParallelTest {
         Transaction t4 = Transaction.call(preminedAddress, usr1, 4, BigInteger.valueOf(500_000), new byte[0], 100000L, 1);
 
         Transaction[] batch = new Transaction[]{t0, t1, t2, t3, t4};
-        SimpleFuture<TransactionResult>[] results = avm.run(generateCTXBatch(batch));
-        for (SimpleFuture<TransactionResult> f : results){
+        SimpleFuture<AvmTransactionResult>[] results = avm.run(generateCTXBatch(batch));
+        for (SimpleFuture<AvmTransactionResult> f : results){
             f.get();
         }
 
@@ -63,7 +63,7 @@ public class AvmParallelTest {
 
         batch = new Transaction[]{t0, t1, t2, t3, t4};
         results = avm.run(generateCTXBatch(batch));
-        for (SimpleFuture<TransactionResult> f : results){
+        for (SimpleFuture<AvmTransactionResult> f : results){
             f.get();
         }
 
@@ -84,7 +84,7 @@ public class AvmParallelTest {
         }
 
         results = avm.run(generateCTXBatch(batch));
-        for (SimpleFuture<TransactionResult> f : results){
+        for (SimpleFuture<AvmTransactionResult> f : results){
             f.get();
         }
 
@@ -115,8 +115,8 @@ public class AvmParallelTest {
         Transaction t4 = Transaction.call(usr4, usr1, 0, BigInteger.valueOf(1_000_000), new byte[0], 100000L, 1);
 
         Transaction[] batch = new Transaction[]{t0, t1, t2, t3, t4};
-        SimpleFuture<TransactionResult>[] results = avm.run(generateCTXBatch(batch));
-        for (SimpleFuture<TransactionResult> f : results){
+        SimpleFuture<AvmTransactionResult>[] results = avm.run(generateCTXBatch(batch));
+        for (SimpleFuture<AvmTransactionResult> f : results){
             f.get();
         }
 
@@ -144,12 +144,12 @@ public class AvmParallelTest {
         Transaction t4 = Transaction.create(usr4, 0, BigInteger.ZERO, new CodeAndArguments(code, null).encodeToBytes(), 3_000_000L, 1);
 
         Transaction[] batch = new Transaction[]{t0, t1, t2, t3, t4};
-        SimpleFuture<TransactionResult>[] results = avm.run(generateCTXBatch(batch));
-        for (SimpleFuture<TransactionResult> f : results){
+        SimpleFuture<AvmTransactionResult>[] results = avm.run(generateCTXBatch(batch));
+        for (SimpleFuture<AvmTransactionResult> f : results){
             f.get();
         }
 
-        TransactionResult res = results[4].get();
+        AvmTransactionResult res = results[4].get();
         org.aion.vm.api.interfaces.Address contractAddr = AvmAddress.wrap(res.getReturnData());
 
         byte[] args = ABIEncoder.encodeMethodArguments("doTransfer");
@@ -163,7 +163,7 @@ public class AvmParallelTest {
 
         batch = new Transaction[]{t0, t1, t2, t3, t4};
         results = avm.run(generateCTXBatch(batch));
-        for (SimpleFuture<TransactionResult> f : results){
+        for (SimpleFuture<AvmTransactionResult> f : results){
             f.get();
         }
 

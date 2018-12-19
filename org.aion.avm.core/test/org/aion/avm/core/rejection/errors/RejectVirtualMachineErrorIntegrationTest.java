@@ -8,12 +8,12 @@ import org.aion.avm.core.CommonAvmFactory;
 import org.aion.avm.core.dappreading.JarBuilder;
 import org.aion.avm.core.util.CodeAndArguments;
 import org.aion.avm.core.util.Helpers;
+import org.aion.kernel.AvmTransactionResult;
 import org.aion.kernel.Block;
 import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.Transaction;
 import org.aion.kernel.TransactionContext;
 import org.aion.kernel.TransactionContextImpl;
-import org.aion.kernel.TransactionResult;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -50,8 +50,8 @@ public class RejectVirtualMachineErrorIntegrationTest {
         byte[] jar = JarBuilder.buildJarForMainAndClasses(RejectCatchError.class);
         
         // Deploy.
-        TransactionResult createResult = deployJar(jar);
-        Assert.assertEquals(TransactionResult.Code.FAILED_REJECTED, createResult.getStatusCode());
+        AvmTransactionResult createResult = deployJar(jar);
+        Assert.assertEquals(AvmTransactionResult.Code.FAILED_REJECTED, createResult.getResultCode());
     }
 
     @Test
@@ -59,8 +59,8 @@ public class RejectVirtualMachineErrorIntegrationTest {
         byte[] jar = JarBuilder.buildJarForMainAndClasses(RejectInstantiateError.class);
         
         // Deploy.
-        TransactionResult createResult = deployJar(jar);
-        Assert.assertEquals(TransactionResult.Code.FAILED_REJECTED, createResult.getStatusCode());
+        AvmTransactionResult createResult = deployJar(jar);
+        Assert.assertEquals(AvmTransactionResult.Code.FAILED_REJECTED, createResult.getResultCode());
     }
 
     @Test
@@ -68,18 +68,18 @@ public class RejectVirtualMachineErrorIntegrationTest {
         byte[] jar = JarBuilder.buildJarForMainAndClasses(RejectSubclassError.class);
         
         // Deploy.
-        TransactionResult createResult = deployJar(jar);
-        Assert.assertEquals(TransactionResult.Code.FAILED_REJECTED, createResult.getStatusCode());
+        AvmTransactionResult createResult = deployJar(jar);
+        Assert.assertEquals(AvmTransactionResult.Code.FAILED_REJECTED, createResult.getResultCode());
     }
 
 
-    private TransactionResult deployJar(byte[] jar) {
+    private AvmTransactionResult deployJar(byte[] jar) {
         long energyLimit = 1_000_000l;
         long energyPrice = 1l;
         byte[] txData = new CodeAndArguments(jar, new byte[0]).encodeToBytes();
         Transaction create = Transaction.create(deployer, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         Block block = new Block(new byte[32], 1, Helpers.randomBytes(Address.LENGTH), System.currentTimeMillis(), new byte[0]);
-        TransactionResult createResult = avm.run(new TransactionContext[] {new TransactionContextImpl(create, block)})[0].get();
+        AvmTransactionResult createResult = avm.run(new TransactionContext[] {new TransactionContextImpl(create, block)})[0].get();
         return createResult;
     }
 }
