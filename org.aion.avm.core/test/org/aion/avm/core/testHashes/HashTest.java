@@ -12,6 +12,7 @@ import org.aion.avm.core.util.HashUtils;
 import org.aion.avm.core.util.Helpers;
 import org.aion.avm.core.util.TestingHelper;
 import org.aion.kernel.*;
+import org.aion.vm.api.interfaces.TransactionContext;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
