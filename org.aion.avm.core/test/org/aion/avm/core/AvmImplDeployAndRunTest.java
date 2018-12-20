@@ -13,6 +13,8 @@ import org.aion.kernel.KernelInterfaceImpl;
 import org.aion.kernel.TransactionContextImpl;
 import org.aion.kernel.Transaction;
 import org.aion.vm.api.interfaces.TransactionContext;
+import org.aion.vm.api.interfaces.TransactionResult;
+import org.aion.vm.api.interfaces.VirtualMachine;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +32,7 @@ public class AvmImplDeployAndRunTest {
     private Block block = new Block(new byte[32], 1, Helpers.randomBytes(Address.LENGTH), System.currentTimeMillis(), new byte[0]);
 
     private KernelInterfaceImpl kernel;
-    private Avm avm;
+    private VirtualMachine avm;
 
     @Before
     public void setup() {
@@ -43,7 +45,7 @@ public class AvmImplDeployAndRunTest {
         this.avm.shutdown();
     }
 
-    public AvmTransactionResult deployHelloWorld() {
+    public TransactionResult deployHelloWorld() {
         byte[] jar = Helpers.readFileToBytes("../examples/build/com.example.helloworld.jar");
         byte[] txData = new CodeAndArguments(jar, null).encodeToBytes();
 
@@ -60,21 +62,21 @@ public class AvmImplDeployAndRunTest {
 
         Transaction tx = Transaction.create(from, kernel.getNonce(from).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
-        AvmTransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
+        TransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
 
         assertEquals(AvmTransactionResult.Code.SUCCESS, result.getResultCode());
     }
 
     @Test
     public void testDeployAndMethodCalls() {
-        AvmTransactionResult deployResult = deployHelloWorld();
+        TransactionResult deployResult = deployHelloWorld();
         assertEquals(AvmTransactionResult.Code.SUCCESS, deployResult.getResultCode());
 
         // call the "run" method
         byte[] txData = ABIEncoder.encodeMethodArguments("run");
         Transaction tx = Transaction.call(from, AvmAddress.wrap(deployResult.getReturnData()), kernel.getNonce(from).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
-        AvmTransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
+        TransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
 
         assertEquals(AvmTransactionResult.Code.SUCCESS, result.getResultCode());
         assertEquals("Hello, world!", new String((byte[]) TestingHelper.decodeResult(result)));
@@ -89,7 +91,7 @@ public class AvmImplDeployAndRunTest {
         assertEquals(124, TestingHelper.decodeResult(result));
     }
 
-    public AvmTransactionResult deployTheDeployAndRunTest() {
+    public TransactionResult deployTheDeployAndRunTest() {
         byte[] jar = Helpers.readFileToBytes("../examples/build/com.example.deployAndRunTest.jar");
         byte[] txData = new CodeAndArguments(jar, null).encodeToBytes();
 
@@ -100,14 +102,14 @@ public class AvmImplDeployAndRunTest {
 
     @Test
     public void testDeployAndRunTest() {
-        AvmTransactionResult deployResult = deployTheDeployAndRunTest();
+        TransactionResult deployResult = deployTheDeployAndRunTest();
         assertEquals(AvmTransactionResult.Code.SUCCESS, deployResult.getResultCode());
 
         // test encode method arguments with "encodeArgs"
         byte[] txData = ABIEncoder.encodeMethodArguments("encodeArgs");
         Transaction tx = Transaction.call(from, AvmAddress.wrap(deployResult.getReturnData()), kernel.getNonce(from).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
-        AvmTransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
+        TransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
 
         assertEquals(AvmTransactionResult.Code.SUCCESS, result.getResultCode());
         byte[] expected = ABIEncoder.encodeMethodArguments("addArray", new int[]{123, 1}, 5);
@@ -192,7 +194,7 @@ public class AvmImplDeployAndRunTest {
         org.aion.vm.api.interfaces.Address account1 = AvmAddress.wrap(Helpers.randomBytes(Address.LENGTH));
         Transaction tx = Transaction.balanceTransfer(from, account1, kernel.getNonce(from).longValue(), BigInteger.valueOf(100000L), energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
-        AvmTransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
+        TransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
 
         assertEquals(AvmTransactionResult.Code.SUCCESS, result.getResultCode());
         assertEquals(BigInteger.valueOf(100000L), kernel.getBalance(account1));
@@ -216,7 +218,7 @@ public class AvmImplDeployAndRunTest {
 
         Transaction tx = Transaction.create(from, kernel.getNonce(from).longValue(), BigInteger.valueOf(100000L), txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
-        AvmTransactionResult deployResult = avm.run(new TransactionContext[] {context})[0].get();
+        TransactionResult deployResult = avm.run(new TransactionContext[] {context})[0].get();
 
         assertEquals(AvmTransactionResult.Code.SUCCESS, deployResult.getResultCode());
         assertEquals(BigInteger.valueOf(100000L), kernel.getBalance(AvmAddress.wrap(deployResult.getReturnData())));
@@ -225,7 +227,7 @@ public class AvmImplDeployAndRunTest {
         org.aion.vm.api.interfaces.Address account1 = AvmAddress.wrap(Helpers.randomBytes(Address.LENGTH));
         tx = Transaction.balanceTransfer(from, account1, kernel.getNonce(from).longValue(), BigInteger.valueOf(300000L), energyPrice);
         context = new TransactionContextImpl(tx, block);
-        AvmTransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
+        TransactionResult result = avm.run(new TransactionContext[] {context})[0].get();
 
         assertEquals(AvmTransactionResult.Code.SUCCESS, result.getResultCode());
         assertEquals(BigInteger.valueOf(300000L), kernel.getBalance(account1));
@@ -238,6 +240,6 @@ public class AvmImplDeployAndRunTest {
 
         assertEquals(AvmTransactionResult.Code.SUCCESS, result.getResultCode());
         assertEquals(BigInteger.valueOf(150000L), kernel.getBalance(AvmAddress.wrap(deployResult.getReturnData())));
-        assertEquals(BigInteger.valueOf(300000L - 50000L - result.getEnergyUsed()), kernel.getBalance(account1));
+        assertEquals(BigInteger.valueOf(300000L - 50000L - ((AvmTransactionResult) result).getEnergyUsed()), kernel.getBalance(account1));
     }
 }

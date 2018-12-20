@@ -4,7 +4,6 @@ import java.math.BigInteger;
 
 import org.aion.avm.api.ABIEncoder;
 import org.aion.avm.api.Address;
-import org.aion.avm.core.Avm;
 import org.aion.avm.core.CommonAvmFactory;
 import org.aion.avm.core.dappreading.JarBuilder;
 import org.aion.avm.core.util.CodeAndArguments;
@@ -13,6 +12,8 @@ import org.aion.avm.core.util.Helpers;
 import org.aion.avm.core.util.TestingHelper;
 import org.aion.kernel.*;
 import org.aion.vm.api.interfaces.TransactionContext;
+import org.aion.vm.api.interfaces.TransactionResult;
+import org.aion.vm.api.interfaces.VirtualMachine;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +30,7 @@ public class HashTest {
     private org.aion.vm.api.interfaces.Address dappAddress;
 
     private KernelInterfaceImpl kernel;
-    private Avm avm;
+    private VirtualMachine avm;
 
     private byte[] hashMessage = "test".getBytes();
     private final String blake2bMethodName = "callBlake2b";
@@ -63,7 +64,7 @@ public class HashTest {
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
 
-        AvmTransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
+        TransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
         Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult.getResultCode());
         Assert.assertEquals(true, (TestingHelper.decodeResult(txResult)));
 
@@ -72,7 +73,7 @@ public class HashTest {
         Transaction tx2 = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData2, energyLimit, energyPrice);
         TransactionContextImpl context2 = new TransactionContextImpl(tx2, block);
 
-        AvmTransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
+        TransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
         Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult2.getResultCode());
 
         // check hash correctness
@@ -95,7 +96,7 @@ public class HashTest {
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
 
-        AvmTransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
+        TransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
         Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult.getResultCode());
         Assert.assertEquals(true, (TestingHelper.decodeResult(txResult)));
 
@@ -104,7 +105,7 @@ public class HashTest {
         Transaction tx2 = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData2, energyLimit, energyPrice);
         TransactionContextImpl context2 = new TransactionContextImpl(tx2, block);
 
-        AvmTransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
+        TransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
         Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult2.getResultCode());
 
         // check hash correctness
@@ -127,7 +128,7 @@ public class HashTest {
         Transaction tx = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData, energyLimit, energyPrice);
         TransactionContextImpl context = new TransactionContextImpl(tx, block);
 
-        AvmTransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
+        TransactionResult txResult = avm.run(new TransactionContext[]{context})[0].get();
         Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult.getResultCode());
         Assert.assertEquals(true, (TestingHelper.decodeResult(txResult)));
 
@@ -136,7 +137,7 @@ public class HashTest {
         Transaction tx2 = Transaction.call(deployer, dappAddress, kernel.getNonce(deployer).longValue(), BigInteger.ZERO, txData2, energyLimit, energyPrice);
         TransactionContextImpl context2 = new TransactionContextImpl(tx2, block);
 
-        AvmTransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
+        TransactionResult txResult2 = avm.run(new TransactionContext[]{context2})[0].get();
         Assert.assertEquals(AvmTransactionResult.Code.SUCCESS, txResult2.getResultCode());
 
         // check hash correctness
